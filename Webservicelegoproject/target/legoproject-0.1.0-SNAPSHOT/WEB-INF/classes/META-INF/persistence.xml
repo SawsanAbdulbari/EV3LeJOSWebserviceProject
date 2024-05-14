@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	
+	<persistence-unit name="lego">
+		<class>data.Lego</class>
+		<class>data.LegoSetting</class>
+			
+<!--  jdbcDriver: Specifies the JDBC driver class used for database connection. -->
+<!--  jdbcUrl: Specifies the address to the database. -->
+<!--  jdbcUser: Specifies the username used to authenticate to the database. -->
+<!--  jdbcPassword: Specifies the password used to authenticate to the database. -->
+<!--  ddlGeneration: Specifies how database tables will be generated. "create" indicates that tables will be created if they do not exist. The database should be created beforehand. --> 
+	    <properties>
+		    <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+		    <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:6034/lego" />
+		    <property name="javax.persistence.jdbc.user" value="user" />
+		    <property name="javax.persistence.jdbc.password" value="password" />
+		</properties>
+	</persistence-unit>
+</persistence>

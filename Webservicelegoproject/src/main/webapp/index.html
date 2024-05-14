@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+    <title>EV3 Controls</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 40px;
+            padding: 0 100px 0 100px;
+            color: #333;
+        }
+        h1, h3 {
+            color: #5a5a5a;
+        }
+        form {
+            background-color: #ffffff;
+            padding: 60px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin: 50px 0 10px;
+            font-weight: bold;
+        }
+        input[type='number'], select, input[type='datetime-local'] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+        }
+        input[type='button'] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        input[type='button']:hover {
+            background-color: #45a049;
+        }
+        #stop-button {
+            background-color: #f44336;
+        }
+        #stop-button:hover {
+            background-color: #d32f2f;
+        }
+        
+        .arrow-icons {
+        display: flex;
+        justify-content: space-between;
+        padding-right: 700px;
+        align-items: center;
+        }
+        .arrow-icons i {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+    function sendData(form){
+        var legoSetting = {
+            speed: form.speed.value, // Gets the value of speed input field.
+            direction: form.direction.value, // Gets the value of direction select field.
+            lego: { id: 1 }, // Specifies the Lego entity with ID 1.
+            running: form.running.value, // Gets the value of running select field.
+            turn: form.turn.value // Gets the value of turn hidden input field.
+        };
+
+        var json = JSON.stringify(legoSetting); // Converts the legoSetting object to a JSON string.
+        var xhttp = new XMLHttpRequest();
+
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var settings = JSON.parse(this.responseText); // Parses the response JSON string to an object.
+                document.getElementById("settings").innerHTML = 
+                " Speed = " + settings.speed + 
+                " Direction = " + (settings.direction == 0 ? 'Forward' : 'Backward') +
+                " Running = " + (settings.running == 0 ? 'No' : 'Yes') +
+                " Turn = " + settings.turn; // Updates the HTML element with the returned Lego settings.
+            }
+        };
+
+        xhttp.open("POST", "/rest/lego/setvalues", true); // Sets up a POST request to set Lego values.
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send(json); // Sends the JSON data to the server.
+    }
+
+    function stopLego(form){
+        var stopSetting = {
+                speed: 0, // Sets speed to 0 to stop the Lego.
+                direction: form.direction.value, // Gets the value of direction select field.
+                lego: { id: 1 }, // Specifies the Lego entity with ID 1.
+                running: 0 // Sets running to 0 to stop the Lego.
+             
+        };
+
+        var json = JSON.stringify(stopSetting); // Converts the stopSetting object to a JSON string.
+        var xhttp = new XMLHttpRequest();
+
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var settings = JSON.parse(this.responseText); // Parses the response JSON string to an object.
+                document.getElementById("settings").innerHTML = "Speed = " + settings.speed + " Direction = " + (settings.direction == 0 ? 'Forward' : 'Backward');
+            }
+        };
+
+        xhttp.open("POST", "/rest/lego/setvalues", true); // Sets up a POST request to set Lego values.
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send(json); // Sends the JSON data to the server.
+    }
+    
+    function updateSpeedDisplay() {
+        var speed = document.getElementById("speed").value;
+        document.getElementById("speedDisplay").innerText = speed; // Updates the displayed speed value.
+    }
+    
+    function readSpeed(){
+        var xmlhttp=new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+              var jsontimelist=this.responseText;
+              // Add JSON string as a content of element resultall
+              document.getElementById("resultall").innerHTML = jsonspeedlist;
+              var timelist=JSON.parse(jsontimelist);
+              // Print time by function printTime.
+              printTime(timelist);
+          }
+        };
+  
+      xmlhttp.open("GET", "/rest/lego/getspeed", true);
+        xmlhttp.send();    
+    }
+    
+    function printSpeed(list){
+        var s="<table border='1'>";
+        for (i in list){// or for (var i=0;i<list.length;i++){
+            s=s+"<tr>";
+            s=s+"<td>"+list[i].speed;
+            
+        }
+        s=s+"</table>";
+        document.getElementById("speed").innerHTML=s;
+    }
+        
+        <!-- Time starts here -->
+     function readTime(){
+        var xmlhttp=new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+              var jsontimelist=this.responseText;
+              // Add JSON string as a content of element resultall
+              document.getElementById("resultall").innerHTML = jsontimelist;
+              var timelist=JSON.parse(jsontimelist);
+              // Print time by function printTime.
+              printTime(timelist);
+          }
+        };
+      
+      xmlhttp.open("GET", "/rest/lego/gettime", true);
+        xmlhttp.send();    
+    }
+     
+    function printTime(list){
+        var s="<table border='1'>";
+        for (i in list){// or for (var i=0;i<list.length;i++){
+            s=s+"<tr>";
+            s=s+"<td>"+list[i].time;
+            
+        }
+            s=s+"</table>";
+        document.getElementById("time").innerHTML=s;
+    }
+    
+    
+    </script>
+    <h1>Lego Settings!</h1>
+    <h3>New values</h3>
+    <form>
+    
+	    <label for="speed">Speed:</label> <!-- Label for the speed input field -->
+	    <input type="range" id="speed" name="speed" min="0" max="500" value="0" oninput="updateSpeedDisplay()" required>
+	    <span id="speedDisplay">0</span> <!-- Displays the current speed -->
+
+        <label for="direction">Direction:</label> <!-- Label for the direction select field -->
+        <select id="direction" name="direction" required>
+            <option value="0">Forward</option> <!-- Option for forward direction -->
+            <option value="1">Backward</option> <!-- Option for backward direction -->
+        </select>
+        
+        
+        <label for="running">Run:</label> <!-- Label for the running select field -->
+		<select id="running" name="running" required>
+		    <option value="0">No</option> <!-- Option for not running -->
+		    <option value="1">Yes</option> <!-- Option for running -->
+		</select>
+		
+	    <label for="turn">Turn:</label> <!-- Label for the turn hidden input field -->
+	    <div class="arrow-icons"> <!-- Container for arrow icons -->
+	        <i id="left-arrow" class="fas fa-arrow-left" onclick="document.getElementById('turn').value = -1;"></i> <!-- Arrow icon for left turn -->
+	        <i id="forward-arrow" class="fas fa-arrow-up" onclick="document.getElementById('turn').value = 0;"></i> <!-- Arrow icon for forward turn -->
+	        <i id="right-arrow" class="fas fa-arrow-right" onclick="document.getElementById('turn').value = 1;"></i> <!-- Arrow icon for right turn -->
+	    </div>
+	    <input type="hidden" id="turn" name="turn" value="0"> <!-- Hidden input field for turn value -->
+	    	        
+        <input type='button' name='start' value='Start' onclick='sendData(this.form);'> <!-- Button to start sending Lego data -->
+        <input type='button' name='stop' value='Stop' onclick='stopLego(this.form);' id="stop-button"> <!-- Button to stop sending Lego data -->
+    
+    </form>
+    
+    <p id='settings'></p> <!-- Paragraph element to display Lego settings -->
+    
+    
+    <h1>Speed history</h1> <!-- Heading for speed history section -->
+    <button onclick='readSpeed();'>Show speed history</button> <!-- Button to show speed history -->
+    <p id='resultall'></p> <!-- Paragraph element to display speed history -->
+    <div id='speed'> <!-- Container for displaying speed history -->
+    </div>
+	
+	
+	<h1>Round Time</h1> <!-- Heading for round time section -->
+    <button onclick='readTime();'>Show round time</button> <!-- Button to show round time -->
+    <p id='resultall'></p> <!-- Paragraph element to display round time -->
+    <div id='time'> <!-- Container for displaying round time -->
+    </div>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Link to Font Awesome stylesheet for arrow icons -->
+    
+</body>
+</html>
